@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Chart CSS variables (used directly by Recharts) ─────────────────── */
+:root {
+  --chart-grid:    #f3f4f6;
+  --chart-text:    #9ca3af;
+  --tooltip-bg:    #ffffff;
+  --tooltip-text:  #111827;
+  --tooltip-border:#e5e7eb;
+}
+.dark {
+  --chart-grid:    #1e293b;
+  --chart-text:    #475569;
+  --tooltip-bg:    #1e293b;
+  --tooltip-text:  #f1f5f9;
+  --tooltip-border:#334155;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-100 dark:bg-slate-950 text-gray-900 dark:text-slate-100 antialiased;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
