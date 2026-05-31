@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { formatDisplayDate, today } from './utils/date';
 import { useTheme } from './hooks/useTheme';
+import { useAuth } from './context/AuthContext';
+import AuthScreen from './components/AuthScreen';
+import DataSync from './components/DataSync';
 import Dashboard from './components/Dashboard';
 import Steps from './components/Steps';
 import Sleep from './components/Sleep';
@@ -10,7 +13,7 @@ import Weight from './components/Weight';
 import Calories from './components/Calories';
 import {
   LayoutDashboard, Activity, Moon, Utensils, Droplets, Scale, Flame,
-  ChevronLeft, Sun, Moon as MoonIcon,
+  ChevronLeft, Sun, Moon as MoonIcon, LogOut,
 } from 'lucide-react';
 
 const TABS = [
@@ -34,9 +37,20 @@ const SECTION_MAP = {
 
 
 export default function App() {
+  const { user, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [selectedDate, setSelectedDate] = useState(today());
   const { theme, toggleTheme } = useTheme();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-gray-400 text-sm">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) return <AuthScreen />;
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
@@ -46,6 +60,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-slate-950">
+      <DataSync userId={user.id} />
       {/* ── Top Nav ── */}
       <header className="bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none dark:border-b dark:border-slate-800">
         <div className="w-full px-4 sm:px-6 lg:px-10">
@@ -70,6 +85,14 @@ export default function App() {
                 {theme === 'dark'
                   ? <Sun size={14} strokeWidth={2.5} />
                   : <MoonIcon size={14} strokeWidth={2.5} />}
+              </button>
+              <button
+                onClick={signOut}
+                className="w-8 h-8 rounded-lg border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-400 dark:text-slate-400 hover:border-red-400 hover:text-red-400 transition-colors"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut size={14} strokeWidth={2.5} />
               </button>
             </div>
           </div>
