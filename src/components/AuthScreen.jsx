@@ -16,19 +16,24 @@ export default function AuthScreen() {
     setMessage('');
     setLoading(true);
 
-    if (mode === 'login') {
-      const { error: err } = await signIn(email, password);
-      if (err) setError(err.message);
-    } else {
-      const { error: err } = await signUp(email, password);
-      if (err) {
-        setError(err.message);
+    try {
+      if (mode === 'login') {
+        const { error: err } = await signIn(email, password);
+        if (err) setError(err.message);
       } else {
-        setMessage('Account created! Check your email to confirm, then log in.');
-        setMode('login');
+        const { error: err } = await signUp(email, password);
+        if (err) {
+          setError(err.message);
+        } else {
+          setMessage('Account created! Check your email to confirm, then log in.');
+          setMode('login');
+        }
       }
+    } catch (err) {
+      setError(err?.message ?? 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -58,10 +63,12 @@ export default function AuthScreen() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs text-gray-500 mb-1 font-medium">Email</label>
+              <label htmlFor="auth-email" className="block text-xs text-gray-500 mb-1 font-medium">Email</label>
               <input
+                id="auth-email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -69,11 +76,13 @@ export default function AuthScreen() {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1 font-medium">Password</label>
+              <label htmlFor="auth-password" className="block text-xs text-gray-500 mb-1 font-medium">Password</label>
               <input
+                id="auth-password"
                 type="password"
                 required
                 minLength={6}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
