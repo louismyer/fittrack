@@ -11,7 +11,7 @@ import {
   mifflinBMR, calcActiveCalories, calcNEATCalories,
   buildHistory, getAdaptiveTDEE, getMET, parseDurationMinutes,
 } from '../utils/calories';
-import { getThisWeekDates, getLastWeekDates } from '../utils/stats';
+import { getThisWeekDates, getLastWeekDates, getFlatMeals } from '../utils/stats';
 import Card from './ui/Card';
 import SectionHeader from './ui/SectionHeader';
 import WeekComparison from './WeekComparison';
@@ -58,8 +58,7 @@ function BurnChart({ dates }) {
 
     const weightKg = weightDay?.weight;
     const steps    = stepsData?.steps || 0;
-    const meals    = Array.isArray(foodData) ? foodData : [];
-    const consumed = meals.reduce((a, m) => a + (m.calories || 0), 0);
+    const consumed = getFlatMeals(foodData).reduce((a, m) => a + (m.calories || 0), 0);
 
     const profileHeight = profile ? parseFloat(profile.height) : null;
     const bmr    = profile ? (mifflinBMR(weightKg, profileHeight, parseInt(profile.age), profile.sex) || 0) : 0;
@@ -171,8 +170,7 @@ export default function Calories({ date = today(), onDateChange }) {
   const weightKg     = latestWeight;
   const steps        = stepsData?.steps || 0;
   const activities   = stepsData?.activities || [];
-  const meals        = Array.isArray(foodData) ? foodData : [];
-  const consumed     = meals.reduce((a, m) => a + (m.calories || 0), 0);
+  const consumed     = getFlatMeals(foodData).reduce((a, m) => a + (m.calories || 0), 0);
 
   const heightCm       = parseFloat(profile.height) || null;
   const formulaBMR     = mifflinBMR(weightKg, heightCm, parseInt(profile.age), profile.sex);

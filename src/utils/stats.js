@@ -1,5 +1,21 @@
 import { shortDate, calcHoursSlept } from './date';
 
+/**
+ * Flatten food day-data into a single array of meal entries.
+ * Handles both the legacy flat-array format and the new
+ * { breakfast, lunch, dinner, snacks } object format.
+ */
+export function getFlatMeals(data) {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  return [
+    ...(data.breakfast || []),
+    ...(data.lunch    || []),
+    ...(data.dinner   || []),
+    ...(data.snacks   || []),
+  ];
+}
+
 /** Read water intake for a day in ml, regardless of old glasses format. */
 export function getWaterMl(data) {
   if (!data) return 0;
@@ -59,8 +75,7 @@ export function getSeriesData(section, dates) {
         return { label, value: hours };
       }
       case 'food': {
-        const meals = Array.isArray(data) ? data : [];
-        const cals = meals.reduce((a, m) => a + (m.calories || 0), 0);
+        const cals = getFlatMeals(data).reduce((a, m) => a + (m.calories || 0), 0);
         return { label, value: cals };
       }
       case 'water':
@@ -107,22 +122,10 @@ export function calcWeekComparison(section, thisDates, lastDates) {
       };
     }
     case 'food': {
-      const thisCals = thisDates.map((d) => {
-        const meals = readDay('food', d);
-        return Array.isArray(meals) ? meals.reduce((a, m) => a + (m.calories || 0), 0) : 0;
-      });
-      const lastCals = lastDates.map((d) => {
-        const meals = readDay('food', d);
-        return Array.isArray(meals) ? meals.reduce((a, m) => a + (m.calories || 0), 0) : 0;
-      });
-      const thisProt = thisDates.map((d) => {
-        const meals = readDay('food', d);
-        return Array.isArray(meals) ? meals.reduce((a, m) => a + (m.protein || 0), 0) : 0;
-      });
-      const lastProt = lastDates.map((d) => {
-        const meals = readDay('food', d);
-        return Array.isArray(meals) ? meals.reduce((a, m) => a + (m.protein || 0), 0) : 0;
-      });
+      const thisCals = thisDates.map((d) => getFlatMeals(readDay('food', d)).reduce((a, m) => a + (m.calories || 0), 0));
+      const lastCals = lastDates.map((d) => getFlatMeals(readDay('food', d)).reduce((a, m) => a + (m.calories || 0), 0));
+      const thisProt = thisDates.map((d) => getFlatMeals(readDay('food', d)).reduce((a, m) => a + (m.protein  || 0), 0));
+      const lastProt = lastDates.map((d) => getFlatMeals(readDay('food', d)).reduce((a, m) => a + (m.protein  || 0), 0));
       return {
         metrics: [
           { label: 'Avg Calories / Day', thisVal: Math.round(avg(thisCals)), lastVal: Math.round(avg(lastCals)), unit: 'kcal', higherIsBetter: false },
