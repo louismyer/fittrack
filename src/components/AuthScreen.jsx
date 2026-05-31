@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const INPUT = 'w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors';
 
 export default function AuthScreen() {
   const { signIn, signUp } = useAuth();
@@ -15,7 +18,6 @@ export default function AuthScreen() {
     setError('');
     setMessage('');
     setLoading(true);
-
     try {
       if (mode === 'login') {
         const { error: err } = await signIn(email, password);
@@ -27,6 +29,8 @@ export default function AuthScreen() {
         } else {
           setMessage('Account created! Check your email to confirm, then log in.');
           setMode('login');
+          setEmail('');
+          setPassword('');
         }
       }
     } catch (err) {
@@ -36,77 +40,100 @@ export default function AuthScreen() {
     }
   };
 
+  const switchMode = () => {
+    setMode((m) => (m === 'login' ? 'signup' : 'login'));
+    setError('');
+    setMessage('');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+
+        {/* Logo */}
         <div className="text-center mb-8">
-          <span className="text-5xl">🏃</span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-3">FitTrack</h1>
-          <p className="text-sm text-gray-400 mt-1">Your personal fitness dashboard</p>
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-brand rounded-2xl mb-4 shadow-md">
+            <Activity size={28} className="text-white" strokeWidth={2.5} />
+          </div>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight uppercase">FitTrack</h1>
+          <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">Your personal fitness dashboard</p>
         </div>
 
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-5">
-            {mode === 'login' ? 'Sign in' : 'Create account'}
+        {/* Card */}
+        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-5">
+            {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
           </h2>
 
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+            <div className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-900 text-red-600 dark:text-red-400 text-sm rounded-lg px-4 py-3 mb-4">
               {error}
             </div>
           )}
           {message && (
-            <div className="bg-green-50 border border-green-100 text-green-600 text-sm rounded-lg px-4 py-3 mb-4">
+            <div className="bg-green-50 dark:bg-green-950 border border-green-100 dark:border-green-900 text-green-700 dark:text-green-400 text-sm rounded-lg px-4 py-3 mb-4">
               {message}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
             <div>
-              <label htmlFor="auth-email" className="block text-xs text-gray-500 mb-1 font-medium">Email</label>
+              <label htmlFor="auth-email" className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
+                Email
+              </label>
               <input
                 id="auth-email"
+                name="email"
                 type="email"
                 required
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={INPUT}
               />
             </div>
+
             <div>
-              <label htmlFor="auth-password" className="block text-xs text-gray-500 mb-1 font-medium">Password</label>
+              <label htmlFor="auth-password" className="block text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
+                Password
+              </label>
               <input
                 id="auth-password"
+                name="password"
                 type="password"
                 required
                 minLength={6}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Min. 6 characters"
+                className={INPUT}
               />
             </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-60"
+              className="w-full bg-brand hover:bg-brand-dark text-white py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 mt-1"
             >
               {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
             </button>
           </form>
 
-          <p className="text-sm text-center text-gray-400 mt-5">
-            {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-            <button
-              onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setMessage(''); }}
-              className="text-blue-500 hover:underline font-medium"
-            >
-              {mode === 'login' ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
+          <div className="mt-5 pt-4 border-t border-gray-100 dark:border-slate-800 text-center">
+            <p className="text-sm text-gray-400 dark:text-slate-500">
+              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+              {' '}
+              <button
+                type="button"
+                onClick={switchMode}
+                className="text-brand hover:underline font-semibold"
+              >
+                {mode === 'login' ? 'Sign up' : 'Sign in'}
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
