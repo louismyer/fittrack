@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getRememberMe } from '../lib/supabase';
 
 const INPUT = 'w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-colors';
 
@@ -9,6 +10,7 @@ export default function AuthScreen() {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMeChecked] = useState(getRememberMe);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       if (mode === 'login') {
-        const { error: err } = await signIn(email, password);
+        const { error: err } = await signIn(email, password, rememberMe);
         if (err) setError(err.message);
       } else {
         const { error: err } = await signUp(email, password);
@@ -111,6 +113,18 @@ export default function AuthScreen() {
                 className={INPUT}
               />
             </div>
+
+            {mode === 'login' && (
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMeChecked(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-brand focus:ring-brand/40"
+                />
+                <span className="text-sm text-gray-600 dark:text-slate-400">Remember me</span>
+              </label>
+            )}
 
             <button
               type="submit"

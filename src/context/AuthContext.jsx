@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, setRememberMe } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
@@ -34,8 +34,10 @@ export function AuthProvider({ children }) {
   const signUp = (email, password) =>
     supabase.auth.signUp({ email, password });
 
-  const signIn = (email, password) =>
-    supabase.auth.signInWithPassword({ email, password });
+  const signIn = (email, password, rememberMe = true) => {
+    setRememberMe(rememberMe);
+    return supabase.auth.signInWithPassword({ email, password });
+  };
 
   const signOut = () => supabase.auth.signOut();
 
