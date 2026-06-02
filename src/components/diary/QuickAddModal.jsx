@@ -26,48 +26,46 @@ export default function QuickAddModal({ mealKey, editItem, onClose, onLog }) {
     onClose();
   };
 
+  const fields = { calories, protein, carbs, fat };
+  const setters = { calories: setCalories, protein: setProtein, carbs: setCarbs, fat: setFat };
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-surface">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-border">
-        <button type="button" onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-secondary">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-slate-800">
+        <button type="button" onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-slate-500">
           <X size={18} />
         </button>
-        <h2 className="text-[15px] font-semibold text-section-header">
+        <h2 className="text-base font-bold text-gray-900 dark:text-white">
           {editItem ? 'Edit' : 'Quick Add'} — {MEAL_LABELS[mealKey]}
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24 max-w-2xl mx-auto w-full">
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-wide text-secondary mb-1.5">Food Name</label>
+          <label className="block text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500 mb-1.5">Food Name</label>
           <input type="text" value={name} onChange={e => setName(e.target.value)} className={INPUT_CLS} placeholder="e.g. Homemade smoothie" />
         </div>
-        {[
-          ['calories', 'Calories (kcal)'],
-          ['protein', 'Protein (g)'],
-          ['carbs', 'Carbs (g)'],
-          ['fat', 'Fat (g)'],
-        ].map(([key, label]) => (
+        {[['calories', 'Calories (kcal)'], ['protein', 'Protein (g)'], ['carbs', 'Carbs (g)'], ['fat', 'Fat (g)']].map(([key, label]) => (
           <div key={key}>
-            <label className="block text-[11px] font-semibold uppercase tracking-wide text-secondary mb-1.5">{label}</label>
+            <label className="block text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500 mb-1.5">{label}</label>
             <input
               type="number"
               inputMode="decimal"
               min="0"
-              value={{ calories, protein, carbs, fat }[key]}
-              onChange={e => ({ calories: setCalories, protein: setProtein, carbs: setCarbs, fat: setFat }[key](e.target.value))}
+              value={fields[key]}
+              onChange={e => setters[key](e.target.value)}
               className={INPUT_CLS}
             />
           </div>
         ))}
       </div>
 
-      <div className="p-4 border-t border-surface-border">
+      <div className="p-4 border-t border-gray-100 dark:border-slate-800">
         <button
           type="button"
           onClick={handleLog}
           disabled={!name.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[15px] font-semibold text-white bg-brand disabled:opacity-50"
+          className="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold text-white bg-brand disabled:opacity-50"
         >
           <Check size={16} />
           {editItem ? 'Update' : 'Log to'} {MEAL_LABELS[mealKey]}

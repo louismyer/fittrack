@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X, Search, ScanLine, Pencil, Clock } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 const ACTIONS = [
-  { id: 'search', label: 'Search', Icon: Search, emoji: '🔍' },
-  { id: 'scan', label: 'Scan Barcode', Icon: ScanLine, emoji: '📷' },
-  { id: 'quick-add', label: 'Quick Add', Icon: Pencil, emoji: '✏️' },
-  { id: 'recent', label: 'Recent Foods', Icon: Clock, emoji: '🍽️' },
+  { id: 'search', label: 'Search', emoji: '🔍' },
+  { id: 'scan', label: 'Scan Barcode', emoji: '📷' },
+  { id: 'quick-add', label: 'Quick Add', emoji: '✏️' },
+  { id: 'recent', label: 'Recent Foods', emoji: '🍽️' },
 ];
 
 export default function LogFab({ onAction }) {
@@ -31,19 +31,19 @@ export default function LogFab({ onAction }) {
   };
 
   return (
-    <div ref={fabRef} className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-3">
+    <div ref={fabRef} className="fixed bottom-6 right-6 sm:bottom-8 sm:right-10 z-40 flex flex-col items-end gap-3">
       {open && (
-        <div className="flex flex-col items-center gap-2 mb-1">
+        <div className="flex flex-col items-end gap-2">
           {ACTIONS.map(({ id, label, emoji }, i) => (
             <button
               key={id}
               type="button"
               onClick={() => handleAction(id)}
-              className="flex items-center gap-3 bg-surface rounded-lg shadow-lg px-4 py-3 min-w-[200px] animate-fab-in"
+              className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg px-4 py-3 min-w-[180px] animate-fab-in"
               style={{ animationDelay: `${i * 30}ms` }}
             >
-              <span className="text-xl">{emoji}</span>
-              <span className="text-[15px] font-semibold text-section-header">{label}</span>
+              <span className="text-lg">{emoji}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{label}</span>
             </button>
           ))}
         </div>

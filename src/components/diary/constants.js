@@ -56,4 +56,4 @@ export function getDefaultMeal() {
 }
 
 export const INPUT_CLS =
-  'w-full border border-surface-border bg-surface text-section-header rounded-lg px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 placeholder-secondary';
+  'w-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 dark:placeholder-slate-500';

@@ -17,8 +17,7 @@ export default function FoodLogRow({ item, mealKey, onDelete, onEdit }) {
   const handleTouchMove = (e) => {
     if (!swiping) return;
     const diff = e.touches[0].clientX - startX.current;
-    const next = Math.min(0, Math.max(-80, startOffset.current + diff));
-    setOffsetX(next);
+    setOffsetX(Math.min(0, Math.max(-80, startOffset.current + diff)));
   };
 
   const handleTouchEnd = () => {
@@ -46,16 +45,16 @@ export default function FoodLogRow({ item, mealKey, onDelete, onEdit }) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full flex items-center justify-between bg-background px-3 py-2.5 text-left transition-transform duration-150"
+        className="relative w-full flex items-center justify-between bg-gray-50 dark:bg-slate-800 rounded-lg px-3 py-2.5 text-left transition-transform duration-150"
         style={{ transform: `translateX(${offsetX}px)` }}
       >
         <div className="flex-1 min-w-0 pr-3">
-          <p className="text-[15px] font-semibold text-section-header truncate">{item.name}</p>
-          <p className="text-[13px] text-secondary mt-0.5">
+          <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{item.name}</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
             {item.quantity}{item.unit === 'serving' ? ' serving' : ` ${item.unit}`}
           </p>
         </div>
-        <span className="text-[15px] font-semibold text-brand flex-shrink-0">
+        <span className="text-sm font-bold text-brand flex-shrink-0">
           {item.calories} kcal
         </span>
       </button>
@@ -68,7 +67,7 @@ export function MealEmptyState({ mealKey, onAdd }) {
     <button
       type="button"
       onClick={() => onAdd(mealKey)}
-      className="w-full py-4 text-center text-[13px] text-secondary hover:text-brand transition-colors"
+      className="w-full py-4 text-center text-xs text-gray-400 dark:text-slate-500 hover:text-brand transition-colors"
     >
       Tap + to log {MEAL_LABELS[mealKey]}
     </button>

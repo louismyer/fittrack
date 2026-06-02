@@ -31,7 +31,7 @@ function CaloriesChart({ calTarget }) {
   const data = getSeriesData('food', getPastDates(14));
   return (
     <Card className="p-5">
-      <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">14-Day Calories</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500 mb-4">14-Day Calories</p>
       <div style={{ height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
@@ -217,28 +217,16 @@ export default function Food({ date = today(), onDateChange }) {
 
   return (
     <>
-      <div className="space-y-4 pb-28 max-w-[375px] mx-auto">
-        <SectionHeader title="Nutrition" subtitle="Daily food diary">
-          <div className="flex items-center gap-2">
-            {onDateChange && <DateNav date={date} onChange={onDateChange} />}
-            <button
-              type="button"
-              onClick={() => { setTempTargets(targets); setShowSettings(s => !s); }}
-              className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-section-header border border-surface-border rounded-lg px-3 py-1.5 transition-colors"
-            >
-              <Settings size={12} strokeWidth={2.5} />
-              {showSettings ? 'Close' : 'Targets'}
-            </button>
-          </div>
-        </SectionHeader>
+      <div className="space-y-4">
+        <SectionHeader title="Nutrition" subtitle="Meals and macros" />
 
         {showSettings && (
           <Card className="p-5">
-            <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Daily Targets</p>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500 mb-4">Daily Targets</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
               {[['calories', 'Calories (kcal)'], ['protein', 'Protein (g)'], ['carbs', 'Carbs (g)'], ['fat', 'Fat (g)']].map(([key, label]) => (
                 <div key={key}>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-secondary mb-1.5">{label}</label>
+                  <label className="block text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500 mb-1.5">{label}</label>
                   <input
                     type="number"
                     min="0"
@@ -249,25 +237,44 @@ export default function Food({ date = today(), onDateChange }) {
                 </div>
               ))}
             </div>
-            <button onClick={saveTargets} className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-brand hover:bg-brand/90 transition-colors">
+            <button onClick={saveTargets} className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-brand hover:bg-brand/90 transition-colors">
               Save Targets
             </button>
           </Card>
         )}
 
-        <DailySummaryBar totals={totals} targets={targets} />
+        <DailySummaryBar
+          totals={totals}
+          targets={targets}
+          headerActions={
+            <>
+              {onDateChange && <DateNav date={date} onChange={onDateChange} />}
+              <button
+                type="button"
+                onClick={() => { setTempTargets(targets); setShowSettings(s => !s); }}
+                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-200 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Settings size={12} strokeWidth={2.5} />
+                {showSettings ? 'Close' : 'Targets'}
+              </button>
+            </>
+          }
+        />
+
         <WaterWidget water={water} onChange={setWater} />
 
-        {MEAL_KEYS.map(key => (
-          <MealSection
-            key={key}
-            mealKey={key}
-            items={meals[key] || []}
-            onAddFood={handleMealAdd}
-            onRemoveFood={removeFood}
-            onEditFood={handleEditFood}
-          />
-        ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {MEAL_KEYS.map(key => (
+            <MealSection
+              key={key}
+              mealKey={key}
+              items={meals[key] || []}
+              onAddFood={handleMealAdd}
+              onRemoveFood={removeFood}
+              onEditFood={handleEditFood}
+            />
+          ))}
+        </div>
 
         <CaloriesChart calTarget={targets.calories} />
         <WeekComparison metrics={metrics} title="Nutrition — Week Comparison" />

@@ -33,42 +33,42 @@ export default function FoodDetailModal({ product, mealKey, editItem, onBack, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-surface">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-border flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
         <button
           type="button"
           onClick={onBack || onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-secondary hover:bg-background transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
           aria-label="Back"
         >
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1 min-w-0">
-          <h2 className="text-[15px] font-semibold text-section-header truncate">{name}</h2>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white truncate">{name}</h2>
           {(product.brands || editItem?.brand) && (
-            <p className="text-[13px] text-secondary truncate">{product.brands || editItem?.brand}</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 truncate">{product.brands || editItem?.brand}</p>
           )}
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-secondary hover:bg-background transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
           aria-label="Close"
         >
           <X size={16} />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 max-w-2xl mx-auto w-full">
         {product.serving_size && (
-          <div className="bg-background rounded-lg px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-secondary">Serving Size</p>
-            <p className="text-[13px] font-medium text-section-header mt-0.5">{product.serving_size}</p>
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-lg px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500">Serving Size</p>
+            <p className="text-sm font-semibold text-gray-700 dark:text-slate-200 mt-0.5">{product.serving_size}</p>
           </div>
         )}
 
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-wide text-secondary mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wide text-gray-400 dark:text-slate-500 mb-2">
             Quantity
           </label>
           <div className="flex gap-2">
@@ -96,7 +96,7 @@ export default function FoodDetailModal({ product, mealKey, editItem, onBack, on
             </select>
           </div>
           {macros.estimated && (
-            <p className="text-[13px] text-secondary mt-2 italic">
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-2 italic">
               Nutrition estimated based on serving size.
             </p>
           )}
@@ -105,11 +105,11 @@ export default function FoodDetailModal({ product, mealKey, editItem, onBack, on
         <MacroPreview macros={macros} />
       </div>
 
-      <div className="p-4 border-t border-surface-border flex-shrink-0">
+      <div className="p-4 border-t border-gray-100 dark:border-slate-800 flex-shrink-0">
         <button
           type="button"
           onClick={handleLog}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[15px] font-semibold text-white bg-brand hover:bg-brand/90 active:scale-[0.98] transition-all"
+          className="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold text-white bg-brand hover:bg-brand/90 active:scale-[0.98] transition-all"
         >
           <Check size={16} strokeWidth={2.5} />
           {editItem ? 'Update' : 'Log to'} {MEAL_LABELS[mealKey]}
