@@ -59,7 +59,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-950">
+    <div className="min-h-screen bg-background dark:bg-slate-950">
       <DataSync userId={user.id} />
       {/* ── Top Nav ── */}
       <header className="bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm dark:shadow-none dark:border-b dark:border-slate-800">
@@ -67,7 +67,7 @@ export default function App() {
           {/* Brand row */}
           <div className="flex items-center justify-between h-14 border-b border-gray-100 dark:border-slate-800">
             <button onClick={() => handleTabChange('home')} className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-brand rounded flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 bg-brand rounded-lg flex items-center justify-center flex-shrink-0">
                 <Activity size={14} className="text-white" strokeWidth={2.5} />
               </div>
               <span className="font-black text-gray-900 dark:text-white text-lg tracking-tight uppercase">FitTrack</span>

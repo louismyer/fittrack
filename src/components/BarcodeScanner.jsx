@@ -98,10 +98,10 @@ export default function BarcodeScanner({ onScan, onClose }) {
                       bottom: !isTop   ? 0 : undefined,
                       left:   isLeft   ? 0 : undefined,
                       right:  !isLeft  ? 0 : undefined,
-                      borderTop:    isTop  ? '3px solid #FC4C02' : undefined,
-                      borderBottom: !isTop ? '3px solid #FC4C02' : undefined,
-                      borderLeft:   isLeft  ? '3px solid #FC4C02' : undefined,
-                      borderRight:  !isLeft ? '3px solid #FC4C02' : undefined,
+                      borderTop:    isTop  ? '3px solid #4F46E5' : undefined,
+                      borderBottom: !isTop ? '3px solid #4F46E5' : undefined,
+                      borderLeft:   isLeft  ? '3px solid #4F46E5' : undefined,
+                      borderRight:  !isLeft ? '3px solid #4F46E5' : undefined,
                       borderTopLeftRadius:     (isTop && isLeft)   ? 4 : undefined,
                       borderTopRightRadius:    (isTop && !isLeft)  ? 4 : undefined,
                       borderBottomLeftRadius:  (!isTop && isLeft)  ? 4 : undefined,
@@ -132,7 +132,7 @@ export default function BarcodeScanner({ onScan, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="mt-2 px-6 py-2.5 bg-white text-gray-900 rounded-full text-sm font-semibold"
+              className="mt-2 px-6 py-2.5 bg-white text-gray-900 rounded-lg text-sm font-semibold"
             >
               Go Back
             </button>
