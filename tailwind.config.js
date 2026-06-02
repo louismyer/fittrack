@@ -7,6 +7,15 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        'scan-line': {
+          '0%, 100%': { top: '0%', opacity: '0.9' },
+          '50%':      { top: '100%', opacity: '0.7' },
+        },
+      },
+      animation: {
+        'scan-line': 'scan-line 2s ease-in-out infinite',
+      },
       colors: {
         brand: {
           DEFAULT: '#FC4C02',

@@ -5,8 +5,9 @@ import {
 } from 'recharts';
 import {
   Plus, ChevronDown, ChevronUp, Search, X, Loader2,
-  ArrowLeft, Check, Settings,
+  ArrowLeft, Check, Settings, ScanLine,
 } from 'lucide-react';
+import BarcodeScanner from './BarcodeScanner';
 import { useDayData, useGlobalData } from '../hooks/useLocalStorage';
 import { today, getPastDates } from '../utils/date';
 import {
@@ -236,11 +237,33 @@ function MealSection({ mealKey, items, onAddFood, onRemoveFood }) {
 
 // ─── FoodSearchModal ──────────────────────────────────────────────────────────
 
+/** Convert an Open Food Facts product into the same shape as a USDA food object */
+function offProductToFood(product, barcode) {
+  const n = product.nutriments || {};
+  const cal100 = n['energy-kcal_100g'] ?? (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0);
+  return {
+    fdcId: `off-${barcode}`,
+    description: product.product_name || product.product_name_en || 'Unknown Product',
+    brandOwner: product.brands || '',
+    dataType: 'SR Legacy', // values already per 100 g → use SR Legacy path in getPer100g
+    servingSize: parseFloat(product.serving_quantity) || 100,
+    servingSizeUnit: 'g',
+    foodNutrients: [
+      { nutrientId: 1008, value: cal100 },
+      { nutrientId: 1003, value: n.proteins_100g        || 0 },
+      { nutrientId: 1005, value: n.carbohydrates_100g   || 0 },
+      { nutrientId: 1004, value: n.fat_100g             || 0 },
+    ],
+  };
+}
+
 function FoodSearchModal({ mealKey, onClose, onSelectFood }) {
-  const [query,   setQuery]   = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState(null);
+  const [query,        setQuery]        = useState('');
+  const [results,      setResults]      = useState([]);
+  const [loading,      setLoading]      = useState(false);
+  const [error,        setError]        = useState(null);
+  const [showScanner,  setShowScanner]  = useState(false);
+  const [barcodeMsg,   setBarcodeMsg]   = useState('');
   const debounceRef = useRef(null);
   const inputRef    = useRef(null);
 
@@ -276,6 +299,44 @@ function FoodSearchModal({ mealKey, onClose, onSelectFood }) {
     debounceRef.current = setTimeout(() => search(q), 400);
   };
 
+  /** Called when ZXing detects a barcode */
+  const handleBarcodeScan = useCallback(async (barcode) => {
+    setShowScanner(false);
+    setBarcodeMsg(`Looking up barcode ${barcode}…`);
+    setLoading(true);
+    setError(null);
+    setResults([]);
+    try {
+      // Try Open Food Facts first (free, no key, huge product DB)
+      const offRes = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const offJson = await offRes.json();
+      if (offJson.status === 1 && offJson.product?.product_name) {
+        const food = offProductToFood(offJson.product, barcode);
+        setBarcodeMsg('');
+        onSelectFood(food);
+        return;
+      }
+      // Fallback: search USDA by barcode number
+      const usdaUrl =
+        `https://api.nal.usda.gov/fdc/v1/foods/search` +
+        `?query=${encodeURIComponent(barcode)}` +
+        `&api_key=${USDA_KEY}&pageSize=5&dataType=Branded`;
+      const usdaRes  = await fetch(usdaUrl);
+      const usdaJson = await usdaRes.json();
+      if (usdaJson.foods?.length) {
+        setBarcodeMsg('');
+        setResults(usdaJson.foods);
+      } else {
+        setError(`No product found for barcode ${barcode}. Try searching by name.`);
+      }
+    } catch {
+      setError('Barcode lookup failed — check your connection.');
+    } finally {
+      setLoading(false);
+      setBarcodeMsg('');
+    }
+  }, [onSelectFood]);
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900">
       {/* Header */}
@@ -295,26 +356,44 @@ function FoodSearchModal({ mealKey, onClose, onSelectFood }) {
 
       {/* Search input */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
-        <div className="relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleChange}
-            placeholder="Search foods, brands…"
-            className={`${INPUT_CLS} pl-9`}
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => { setQuery(''); setResults([]); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
-            >
-              <X size={14} />
-            </button>
-          )}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={handleChange}
+              placeholder="Search foods, brands…"
+              className={`${INPUT_CLS} pl-9`}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => { setQuery(''); setResults([]); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          {/* Barcode scan button */}
+          <button
+            type="button"
+            onClick={() => setShowScanner(true)}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-brand hover:text-brand transition-colors"
+            aria-label="Scan barcode"
+            title="Scan barcode"
+          >
+            <ScanLine size={18} />
+          </button>
         </div>
+        {barcodeMsg && (
+          <p className="text-xs text-brand mt-2 flex items-center gap-1.5">
+            <Loader2 size={11} className="animate-spin" />
+            {barcodeMsg}
+          </p>
+        )}
       </div>
 
       {/* Results list */}
@@ -376,6 +455,14 @@ function FoodSearchModal({ mealKey, onClose, onSelectFood }) {
           );
         })}
       </div>
+
+      {/* Barcode scanner overlay */}
+      {showScanner && (
+        <BarcodeScanner
+          onScan={handleBarcodeScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
     </div>
   );
 }
